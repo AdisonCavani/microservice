@@ -31,6 +31,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+using var scope = app.Services.CreateScope();
+
+var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+if (context.Database.IsRelational())
+    context.Database.Migrate();
+
+Seeder.Seed(context);
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
