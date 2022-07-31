@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PlatformService.Database;
+using PlatformService.Repositories;
 using PlatformService.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,7 @@ builder.Services.AddDbContextPool<AppDbContext>(options =>
         npgOptions.EnableRetryOnFailure();
     });
 });
+builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
