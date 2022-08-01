@@ -14,6 +14,7 @@ builder.Services.AddDbContextPool<AppDbContext>(options =>
 builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
 builder.Services.AddValidators();
 builder.Services.AddControllers().AddFluentValidation();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
