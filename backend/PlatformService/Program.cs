@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PlatformService.Database;
 using PlatformService.Repositories;
-using PlatformService.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
