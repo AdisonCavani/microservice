@@ -6,19 +6,11 @@ using PlatformService.Settings;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionSettings = new ConnectionSettings();
-builder.Configuration.GetSection(nameof(ConnectionSettings)).Bind(connectionSettings);
-connectionSettings.Validate();
-
 builder.Services.AddDbContextPool<AppDbContext>(options =>
 {
-    options.UseNpgsql(connectionSettings.SqlConnectionString, npgOptions =>
-    {
-        npgOptions.EnableRetryOnFailure();
-    });
+    options.UseInMemoryDatabase("platform-service");
 });
 builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -31,14 +23,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-using var scope = app.Services.CreateScope();
-
-var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-if (context.Database.IsRelational())
-    context.Database.Migrate();
-
-Seeder.Seed(context);
+app.SeedData();
 
 app.UseHttpsRedirection();
 

@@ -2,10 +2,13 @@
 
 namespace PlatformService.Database;
 
-public class Seeder
+public static class Seeder
 {
-    public static void Seed(AppDbContext context)
+    public static void SeedData(this WebApplication app)
     {
+        using var scope = app.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
         if (context.Platforms.Any())
             return;
 
