@@ -1,6 +1,8 @@
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using PlatformService.Database;
 using PlatformService.Repositories;
+using PlatformService.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,8 @@ builder.Services.AddDbContextPool<AppDbContext>(options =>
     options.UseInMemoryDatabase("platform-service");
 });
 builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
+builder.Services.AddValidators();
+builder.Services.AddControllers().AddFluentValidation();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
