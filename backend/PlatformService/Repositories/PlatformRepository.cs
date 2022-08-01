@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PlatformService.Database;
 using PlatformService.Database.Entities;
+using PlatformService.Domain;
 
 namespace PlatformService.Repositories;
 
@@ -13,26 +14,46 @@ public class PlatformRepository : IPlatformRepository
         _context = context;
     }
 
-    public async Task CreatePlatformAsync(Platform platform, CancellationToken ct = default)
+    public async Task<bool> CreatePlatformAsync(Platform platform, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(platform);
 
-        // TODO: SaveChangesAsync() ???
         await _context.Platforms.AddAsync(platform, ct);
+        return await _context.SaveChangesAsync(ct) >= 0;
     }
 
-    public async Task<IEnumerable<Platform>> GetAllPlatformsAsync(CancellationToken ct = default)
+    public async Task<GetAllPlatformsResult?> GetAllPlatformsAsync(int page, CancellationToken ct = default)
     {
-        return await _context.Platforms.ToListAsync(ct);
+        ArgumentNullException.ThrowIfNull(page);
+
+        if (!await _context.Platforms.AnyAsync(ct))
+            return new GetAllPlatformsResult();
+
+        var pageResults = 5f;
+        var urlsCount = await _context.Platforms
+            .CountAsync(ct);
+        var pageCount = Math.Ceiling(urlsCount / pageResults);
+
+        if (page > pageCount)
+            return null;
+
+        var result = await _context.Platforms
+            .Skip((page - 1) * (int) pageResults)
+            .Take((int) pageResults)
+            .ToListAsync(ct);
+
+        return new GetAllPlatformsResult
+        {
+            Platforms = result,
+            CurrentPage = page,
+            PagesCount = (int) pageCount
+        };
     }
 
     public async Task<Platform?> GetPlatformByIdAsync(int id, CancellationToken ct = default)
     {
-        return await _context.Platforms.FirstOrDefaultAsync(x => x.Id == id, ct);
-    }
+        ArgumentNullException.ThrowIfNull(id);
 
-    public async Task<bool> SaveChangesAsync(CancellationToken ct = default)
-    {
-        return await _context.SaveChangesAsync(ct) >= 0;
+        return await _context.Platforms.FirstOrDefaultAsync(x => x.Id == id, ct);
     }
 }
