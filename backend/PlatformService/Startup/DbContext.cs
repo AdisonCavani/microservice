@@ -18,7 +18,7 @@ public static class DbContext
             connectionSettings.Validate();
             services.AddDbContextPool<AppDbContext>(options =>
             {
-                options.UseNpgsql("User ID=admin; Password=admin123!; Host=localhost; Port=5432; Database=PlatformServiceDb; Pooling=true;",
+                options.UseNpgsql(connectionSettings.SqlConnectionString,
                     npgSettings => { npgSettings.EnableRetryOnFailure(); });
             });
         }
