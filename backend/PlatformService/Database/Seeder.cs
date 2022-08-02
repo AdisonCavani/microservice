@@ -1,4 +1,5 @@
-﻿using PlatformService.Database.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PlatformService.Database.Entities;
 
 namespace PlatformService.Database;
 
@@ -8,6 +9,9 @@ public static class Seeder
     {
         using var scope = app.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        if (app.Environment.IsProduction() && context.Database.IsRelational())
+            context.Database.Migrate();
 
         if (context.Platforms.Any())
             return;

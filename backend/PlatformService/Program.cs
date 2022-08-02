@@ -1,16 +1,15 @@
 using FluentValidation.AspNetCore;
-using Microsoft.EntityFrameworkCore;
 using PlatformService.Database;
 using PlatformService.Repositories;
 using PlatformService.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddDbContextPool<AppDbContext>(options =>
-{
-    options.UseInMemoryDatabase("platform-service");
-});
+// Program
+builder.WebHost.AddAwsParameterStore();
+
+// Configure services
+builder.Services.ConfigureDbContext(builder.Configuration, builder.Environment);
 builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
 builder.Services.AddValidators();
 builder.Services.AddControllers().AddFluentValidation();
@@ -20,7 +19,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
