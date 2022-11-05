@@ -16,16 +16,12 @@ public class PlatformRepository : IPlatformRepository
 
     public async Task<bool> CreatePlatformAsync(Platform platform, CancellationToken ct = default)
     {
-        ArgumentNullException.ThrowIfNull(platform);
-
         await _context.Platforms.AddAsync(platform, ct);
-        return await _context.SaveChangesAsync(ct) >= 0;
+        return await _context.SaveChangesAsync(ct) > 0;
     }
 
     public async Task<GetAllPlatformsResult?> GetAllPlatformsAsync(int page, CancellationToken ct = default)
     {
-        ArgumentNullException.ThrowIfNull(page);
-
         if (!await _context.Platforms.AnyAsync(ct))
             return new GetAllPlatformsResult();
 
@@ -40,6 +36,7 @@ public class PlatformRepository : IPlatformRepository
         var result = await _context.Platforms
             .Skip((page - 1) * (int) pageResults)
             .Take((int) pageResults)
+            .OrderBy(x => x.Id)
             .ToListAsync(ct);
 
         return new GetAllPlatformsResult
@@ -52,8 +49,6 @@ public class PlatformRepository : IPlatformRepository
 
     public async Task<Platform?> GetPlatformByIdAsync(int id, CancellationToken ct = default)
     {
-        ArgumentNullException.ThrowIfNull(id);
-
         return await _context.Platforms.FirstOrDefaultAsync(x => x.Id == id, ct);
     }
 }

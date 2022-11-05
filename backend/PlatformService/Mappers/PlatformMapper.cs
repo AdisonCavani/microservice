@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PlatformService.Contracts.Events;
 using PlatformService.Contracts.Requests;
 using PlatformService.Contracts.Responses;
 using PlatformService.Database.Entities;
@@ -13,5 +14,11 @@ public class PlatformMapper : Profile
         CreateMap<Platform, GetPlatformResponse>();
         CreateMap<CreatePlatformRequest, Platform>();
         CreateMap<GetAllPlatformsResult, GetAllPlatformsResponse>();
+        CreateMap<Platform, PlatformPublished>();
+        CreateMap<Platform, GrpcPlatformModel>()
+            .ForMember(x =>
+                x.PlatformId, opt =>
+                opt.MapFrom(src => src.Id));
+        CreateMap<GetAllPlatformsResult, GetAllPlatformsGrpcResponse>();
     }
 }

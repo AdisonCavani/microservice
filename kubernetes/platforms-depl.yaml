@@ -26,3 +26,21 @@ spec:
             requests:
               memory: 256Mi
               cpu: "0.2"
+---
+apiVersion: v1
+
+kind: Service
+metadata:
+  name: platforms-clusterip-srv
+spec:
+  selector:
+    app: clusterip
+  ports:
+    - name: platform-service
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: platform-service-grpc
+      procotol: TCP
+      port: 666
+      targetPort: 666

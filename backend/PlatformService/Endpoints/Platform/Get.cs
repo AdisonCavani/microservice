@@ -5,6 +5,7 @@ using PlatformService.Contracts;
 using PlatformService.Contracts.Requests;
 using PlatformService.Contracts.Responses;
 using PlatformService.Repositories;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace PlatformService.Endpoints.Platform;
 
@@ -21,6 +22,7 @@ public class Get : EndpointBaseAsync
         _repository = repository;
     }
 
+    [SwaggerOperation(Tags = new[] {"PlatformEndpoint"})]
     [HttpGet(ApiRoutes.Platform.Get)]
     public override async Task<ActionResult<GetPlatformResponse>> HandleAsync(
         [FromQuery] GetPlatformRequest req,
@@ -30,7 +32,7 @@ public class Get : EndpointBaseAsync
 
         if (response is null)
             return NotFound();
-        
+
         return Ok(_mapper.Map<GetPlatformResponse>(response));
     }
 }

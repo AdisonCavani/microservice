@@ -1,6 +1,4 @@
-﻿using PlatformService.Contracts.Requests;
-
-namespace PlatformService.Contracts.Responses;
+﻿namespace PlatformService.Contracts.Responses;
 
 public class GetAllPlatformsResponse
 {

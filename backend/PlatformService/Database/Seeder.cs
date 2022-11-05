@@ -5,18 +5,18 @@ namespace PlatformService.Database;
 
 public static class Seeder
 {
-    public static void SeedData(this WebApplication app)
+    public static async Task SeedDataAsync(this WebApplication app)
     {
-        using var scope = app.Services.CreateScope();
+        await using var scope = app.Services.CreateAsyncScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        if (app.Environment.IsProduction() && context.Database.IsRelational())
-            context.Database.Migrate();
+        if (context.Database.IsRelational())
+            await context.Database.MigrateAsync();
 
-        if (context.Platforms.Any())
+        if (await context.Platforms.AnyAsync())
             return;
 
-        context.Platforms.AddRange(
+        await context.Platforms.AddRangeAsync(
             new Platform
             {
                 Name = "Dotnet",
@@ -37,6 +37,6 @@ public static class Seeder
             }
         );
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 }

@@ -1,6 +1,7 @@
 using FluentValidation.AspNetCore;
 using PlatformService.Database;
-using PlatformService.Repositories;
+using PlatformService.Services;
+using PlatformService.Settings;
 using PlatformService.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,13 +10,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.AddAwsParameterStore();
 
 // Configure services
-builder.Services.ConfigureDbContext(builder.Configuration, builder.Environment);
-builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
+var connectionSettings = new ConnectionSettings();
+builder.Configuration.GetSection(nameof(ConnectionSettings)).Bind(connectionSettings);
+connectionSettings.Validate();
+builder.Services.ConfigureSettings(builder.Configuration);
+builder.Services.ConfigureDbContext(connectionSettings);
+builder.Services.AddServices();
 builder.Services.AddValidators();
+builder.Services.AddGrpc();
 builder.Services.AddControllers().AddFluentValidation();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.EnableAnnotations();
+    options.DescribeAllParametersInCamelCase();
+});
 
 var app = builder.Build();
 
@@ -26,12 +36,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.SeedData();
+await app.SeedDataAsync();
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGrpcService<GrpcPlatformService>();
 
 app.Run();

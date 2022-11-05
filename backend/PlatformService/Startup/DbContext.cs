@@ -6,25 +6,12 @@ namespace PlatformService.Startup;
 
 public static class DbContext
 {
-    public static void ConfigureDbContext(
-        this IServiceCollection services,
-        IConfiguration configuration,
-        IWebHostEnvironment env)
+    public static void ConfigureDbContext(this IServiceCollection services, ConnectionSettings connectionSettings)
     {
-        if (env.IsProduction())
+        services.AddDbContextPool<AppDbContext>(options =>
         {
-            var connectionSettings = new ConnectionSettings();
-            configuration.GetSection(nameof(ConnectionSettings)).Bind(connectionSettings);
-            connectionSettings.Validate();
-            services.AddDbContextPool<AppDbContext>(options =>
-            {
-                options.UseNpgsql(connectionSettings.SqlConnectionString,
-                    npgSettings => { npgSettings.EnableRetryOnFailure(); });
-            });
-        }
-        else
-        {
-            services.AddDbContextPool<AppDbContext>(options => { options.UseInMemoryDatabase("platform-service"); });
-        }
+            options.UseNpgsql(connectionSettings.SqlConnectionString,
+                npgSettings => { npgSettings.EnableRetryOnFailure(); });
+        });
     }
 }

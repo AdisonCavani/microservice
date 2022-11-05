@@ -5,6 +5,7 @@ using PlatformService.Contracts;
 using PlatformService.Contracts.Requests;
 using PlatformService.Contracts.Responses;
 using PlatformService.Repositories;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace PlatformService.Endpoints.Platform;
 
@@ -14,13 +15,14 @@ public class GetAll : EndpointBaseAsync
 {
     private readonly IMapper _mapper;
     private readonly IPlatformRepository _repository;
-    
+
     public GetAll(IMapper mapper, IPlatformRepository repository)
     {
         _mapper = mapper;
         _repository = repository;
     }
-    
+
+    [SwaggerOperation(Tags = new[] {"PlatformEndpoint"})]
     [HttpGet(ApiRoutes.Platform.GetAll)]
     public override async Task<ActionResult<GetAllPlatformsResponse>> HandleAsync(
         [FromQuery] GetAllPlatformsRequest req,
